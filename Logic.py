@@ -23,6 +23,10 @@ class Window:
         self.placeMines(5)
 
 
+    def do_nothing(self):
+        pass
+
+
     def placeMines(self,numberOfMines):
         self.listPlacedMines = []
         i = 0
@@ -42,21 +46,30 @@ class Window:
 class Button:
     def __init__(self,root):
         self.root = root
-        self.button = tk.Button(root,command=self.pressedButton,height=1, width=2)
+        self.button = tk.Button(root, command=self.pressedButtonLeft, height=1, width=2)
         self.placedMine = False
         self.MineImage =ImageTk.PhotoImage(Image.open('MineImage.png').resize((13,13)))
+        self.FlagImage =ImageTk.PhotoImage(Image.open('Flag.png').resize((13,13)))
+        self.root.bind('<Button-1>', pressedButtonLeft)
+        self.root.bind('<Button-3>', pressedButtonRight)
 
 
-    def pressedButton(self):
+    def pressedButtonRight(self):
+        self.button.configure(image=self.FlagImage, height=20, width=18)
+
+    def pressedButtonLeft(self):
         msg = tk.Label(root, text="", height=2, bg="lightgray", bd=5, fg="black", font=("Courier", 44))
         msg.pack(pady=0)
         msg.place(x=90, y=13)
         if self.placedMine is True:
             msg.configure(text ="You lost, game over")
             for i in window.listPlacedMines:
-                self.list_Of_Tiles[i[0]][i[1]].configure(image=self.MineImage,height=20, width=18,bg="red")
+                self.button = self.list_Of_Tiles[i[0]][i[1]]
+                self.button.configure(image=self.MineImage,height=20, width=18,bg="red")
             self.button.configure(image=self.MineImage,height=20, width=18,bg="red")
-
+        for r in self.list_Of_Tiles:
+            for b in r:
+                b.button.configure(command=window.do_nothing)
             # game over need work
         else:
             msg.configure(text="keep playing your good")
@@ -80,6 +93,25 @@ class Button:
             if window.list_Of_Tiles[index + 1][index].placedMine == True:
                 adjacencyMines += 1
 
+            match adjacencyMines:
+                case 0:
+                    self.button.configure(text="", fg='blue', height=1, width=2)
+                case 1:
+                    self.button.configure(text="adjacencyMines",fg='blue', height=1, width=2)
+                case 2:
+                    self.button.configure(text="adjacencyMines", fg='red', height=1, width=2)
+                case 3:
+                    self.button.configure(text="adjacencyMines", fg='green', height=1, width=2)
+                case 4:
+                    self.button.configure(text="adjacencyMines", fg='yellow', height=1, width=2)
+                case 5:
+                    self.button.configure(text="adjacencyMines", fg='brown', height=1, width=2)
+                case 6:
+                    self.button.configure(text="adjacencyMines", fg='purple', height=1, width=2)
+                case 7:
+                    self.button.configure(text="adjacencyMines", fg='orange', height=1, width=2)
+                case 8:
+                    self.button.configure(text="adjacencyMines", fg='black', height=1, width=2)
             self.button.configure(text="adjacencyMines",height=1, width=2)
 
 
