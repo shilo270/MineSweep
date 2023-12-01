@@ -11,13 +11,13 @@ class Window:
         self.root.configure(bg="lightgray")
         #self.root.attributes('-fullscreen',True)
         self.GridSize = 5
-        self.list_Of_Mines = [[] for self.GridSize in range(self.GridSize)]
+        self.list_Of_Tiles = [[] for self.GridSize in range(self.GridSize)]
         #self.canvas = Canvas(bg="pink", height="200")
         for i in range(self.GridSize):
             for j in range(self.GridSize):
                 button = Button(root)
                 button.button.place(x=(j+1)*24 - 13, y=(i+1)*25+ 130)
-                self.list_Of_Mines[i].append(button)
+                self.list_Of_Tiles[i].append(button)
         self.label = tk.Label(text="MineSweep", height=2, bg="lightgray",bd=5, fg="black", font=("Courier",44))
         self.label.pack(pady=0)
         self.label.place(x=90, y=10)
@@ -33,8 +33,81 @@ class Window:
             if (x,y) in listPlacedMines:
                 continue
             listPlacedMines.append((x, y))
-            self.list_Of_Mines[x][y].placedMine = True
+            self.list_Of_Tiles[x][y].placedMine = True
             i += 1
+        for i in range(len(self.list_Of_Tiles)):
+            for j in range(len(self.list_Of_Tiles)):
+                if i == 0:
+                    if j == 0:
+                        countBombs = 0
+                        if self.list_Of_Tiles[i][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j] == True:
+                            countBombs += 1
+                    elif j == len(self.list_Of_Tiles) - 1:
+                        if self.list_Of_Tiles[i][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j] == True:
+                            countBombs += 1
+                    else:
+                        countBombs = 0
+                        if self.list_Of_Tiles[i][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i + 1][j] == True:
+                            countBombs += 1
+
+                elif i == len(self.list_Of_Tiles) - 1:
+                    if j == len(self.list_Of_Tiles) - 1:
+                        countBombs = 0
+                        if self.list_Of_Tiles[i][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i - 1][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i - 1][j] == True:
+                            countBombs += 1
+                    else:
+                        countBombs = 0
+                        if self.list_Of_Tiles[i][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i - 1][j - 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i - 1][j + 1] == True:
+                            countBombs += 1
+                        if self.list_Of_Tiles[i - 1][j] == True:
+                            countBombs += 1
+                else:
+                    countBombs = 0
+                    if self.list_Of_Tiles[i][j - 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j + 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j - 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j + 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j - 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j + 1] == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j] == True:
+                        countBombs += 1
+
+
+                self.list_Of_Tiles[x][y].numberOnTile = countBombs
     # easy 9x9 number of mines 10
     # intermediate 16x16 number of mines 40
     # expert 16x30 number of mines 99
@@ -46,6 +119,7 @@ class Button:
         self.button = tk.Button(root,command=self.pressedButton,height=1, width=2)
         self.placedMine = False
         self.MineImage =ImageTk.PhotoImage(Image.open('pngwing.png').resize((13,13)))
+        self.numberOnTile = 0
 
 
     def pressedButton(self):
@@ -59,8 +133,7 @@ class Button:
         else:
             msg.configure(text="keep playing your good")
             for i in range(9):
-                
-            self.button.configure(text="3",height=1, width=2)
+                self.button.configure(text="3",height=1, width=2)
 
 
 root = tk.Tk()
