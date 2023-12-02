@@ -11,8 +11,9 @@ class Window:
         self.root.configure(bg="lightgray")
         #self.root.attributes('-fullscreen',True)
         self.GridSize = 5
-        self.list_Of_Tiles = [[] for self.GridSize in range(self.GridSize)]
-        #self.canvas = Canvas(bg="pink", height="200")
+        self.list_Of_Tiles = [[] for self.GridSize in range(self.GridSize + 1)]
+        del self.list_Of_Tiles[-1]
+
         for i in range(self.GridSize):
             for j in range(self.GridSize):
                 button = Button(root)
@@ -23,91 +24,127 @@ class Window:
         self.label.place(x=90, y=10)
         self.placeMines(5)
 
-
     def placeMines(self,numberOfMines):
-        listPlacedMines = []
+        listPlacedMines = [0]
         i = 0
-        while i <= numberOfMines:
+        while i < numberOfMines:
             x = random.randint(0, self.GridSize - 1)
             y = random.randint(0, self.GridSize - 1)
-            if (x,y) in listPlacedMines:
+            if (x, y) in listPlacedMines:
                 continue
             listPlacedMines.append((x, y))
             self.list_Of_Tiles[x][y].placedMine = True
             i += 1
+
+
         for i in range(len(self.list_Of_Tiles)):
-            for j in range(len(self.list_Of_Tiles)):
-                if i == 0:
-                    if j == 0:
-                        countBombs = 0
-                        if self.list_Of_Tiles[i][j + 1] == True:
+            for j in range(len(self.list_Of_Tiles[0])):
+                #checks if thers is a bombs on the tile
+                if self.list_Of_Tiles[i][j].placedMine == True:
+                    continue
+                countBombs = 0
+                # checks the center
+                if i != 0 and i != len(self.list_Of_Tiles[0]) - 1:
+                    if j != 0 and j != len(self.list_Of_Tiles[0]) - 1:
+                        if self.list_Of_Tiles[i][j - 1].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j + 1] == True:
+                        if self.list_Of_Tiles[i][j + 1].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j] == True:
+                        if self.list_Of_Tiles[i - 1][j - 1].placedMine == True:
                             countBombs += 1
-                    elif j == len(self.list_Of_Tiles) - 1:
-                        if self.list_Of_Tiles[i][j - 1] == True:
+                        if self.list_Of_Tiles[i - 1][j + 1].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j - 1] == True:
+                        if self.list_Of_Tiles[i - 1][j].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j] == True:
+                        if self.list_Of_Tiles[i + 1][j - 1].placedMine == True:
                             countBombs += 1
-                    else:
-                        countBombs = 0
-                        if self.list_Of_Tiles[i][j - 1] == True:
+                        if self.list_Of_Tiles[i + 1][j + 1].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i][j + 1] == True:
+                        if self.list_Of_Tiles[i + 1][j].placedMine == True:
                             countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j - 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j + 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i + 1][j] == True:
-                            countBombs += 1
-
-                elif i == len(self.list_Of_Tiles) - 1:
-                    if j == len(self.list_Of_Tiles) - 1:
-                        countBombs = 0
-                        if self.list_Of_Tiles[i][j - 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i - 1][j - 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i - 1][j] == True:
-                            countBombs += 1
-                    else:
-                        countBombs = 0
-                        if self.list_Of_Tiles[i][j - 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i][j + 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i - 1][j - 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i - 1][j + 1] == True:
-                            countBombs += 1
-                        if self.list_Of_Tiles[i - 1][j] == True:
-                            countBombs += 1
-                else:
-                    countBombs = 0
-                    if self.list_Of_Tiles[i][j - 1] == True:
+                        self.list_Of_Tiles[i][j].numberOnTile = countBombs
+                #cheks the left column without corners
+                if i !=0 and i != len(self.list_Of_Tiles[0])-1 and j == 0:
+                    if self.list_Of_Tiles[i + 1][j].placedMine == True:
                         countBombs += 1
-                    if self.list_Of_Tiles[i][j + 1] == True:
+                    if self.list_Of_Tiles[i + 1][j + 1].placedMine == True:
                         countBombs += 1
-                    if self.list_Of_Tiles[i - 1][j - 1] == True:
+                    if self.list_Of_Tiles[i][j + 1].placedMine == True:
                         countBombs += 1
-                    if self.list_Of_Tiles[i - 1][j + 1] == True:
+                    if self.list_Of_Tiles[i - 1][j + 1].placedMine == True:
                         countBombs += 1
-                    if self.list_Of_Tiles[i - 1][j] == True:
-                        countBombs += 1
-                    if self.list_Of_Tiles[i + 1][j - 1] == True:
-                        countBombs += 1
-                    if self.list_Of_Tiles[i + 1][j + 1] == True:
-                        countBombs += 1
-                    if self.list_Of_Tiles[i + 1][j] == True:
+                    if self.list_Of_Tiles[i - 1][j].placedMine == True:
                         countBombs += 1
 
+                #checks the right column without corners
+                if i != 0 and i != len(self.list_Of_Tiles[0]) - 1 and j == len(self.list_Of_Tiles[0])-1:
+                    if self.list_Of_Tiles[i + 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j].placedMine == True:
+                        countBombs += 1
 
-                self.list_Of_Tiles[x][y].numberOnTile = countBombs
+                #checks the top row without corners
+                if i == 0 and j != len(self.list_Of_Tiles[0])-1 and j != 0:
+                    if self.list_Of_Tiles[i][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j - 1].placedMine == True:
+                        countBombs += 1
+                #checks the bottom row without corners
+                if i == len(self.list_Of_Tiles[0])-1 and j != len(self.list_Of_Tiles[0])-1 and j != 0:
+                    if self.list_Of_Tiles[i][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j - 1].placedMine == True:
+                        countBombs += 1
+                #check all corners
+                if i == 0 and j == 0:
+                    if self.list_Of_Tiles[i][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j].placedMine == True:
+                        countBombs += 1
+                if i == 0 and j == len(self.list_Of_Tiles) - 1:
+                    if self.list_Of_Tiles[i + 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i + 1][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j - 1].placedMine == True:
+                        countBombs += 1
+                if i == len(self.list_Of_Tiles) - 1 and j == 0:
+                    if self.list_Of_Tiles[i][j + 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j + 1].placedMine == True:
+                        countBombs += 1
+                if i == len(self.list_Of_Tiles) - 1 and j == i == len(self.list_Of_Tiles) - 1:
+                    if self.list_Of_Tiles[i - 1][j - 1].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i - 1][j].placedMine == True:
+                        countBombs += 1
+                    if self.list_Of_Tiles[i][j - 1].placedMine == True:
+                        countBombs += 1
+                self.list_Of_Tiles[i][j].numberOnTile = countBombs
+
+
     # easy 9x9 number of mines 10
     # intermediate 16x16 number of mines 40
     # expert 16x30 number of mines 99
@@ -118,8 +155,11 @@ class Button:
         self.root = root
         self.button = tk.Button(root,command=self.pressedButton,height=1, width=2)
         self.placedMine = False
-        self.MineImage =ImageTk.PhotoImage(Image.open('pngwing.png').resize((13,13)))
+        self.MineImage =ImageTk.PhotoImage(Image.open('MineImage.png').resize((13,13)))
         self.numberOnTile = 0
+
+    #def openAdjacentTiles(pressedButton(self)):
+
 
 
     def pressedButton(self):
@@ -129,11 +169,16 @@ class Button:
         if self.placedMine is True:
             msg.configure(text ="You lost, game over")
             self.button.configure(image=self.MineImage,height=20, width=18,bg="red")
+            for i in range(len(window.list_Of_Tiles)):
+                for j in range(len(window.list_Of_Tiles[0])):
+                    if window.list_Of_Tiles[i][j].placedMine == True:
+                        window.list_Of_Tiles[i][j].button.configure(image=self.MineImage,height=20, width=18)
+
             # game over need work
         else:
             msg.configure(text="keep playing your good")
-            for i in range(9):
-                self.button.configure(text="3",height=1, width=2)
+            self.button.configure(text=self.numberOnTile,height=1, width=2)
+
 
 
 root = tk.Tk()
