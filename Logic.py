@@ -13,7 +13,7 @@ class Window:
         self.label.pack(pady=0)
         self.label.place(x=200, y=10)
         #self.root.attributes('-fullscreen',True)
-        self.GridSize = 15
+        self.GridSize = 5
         self.init_game()
         self.resetButton = tk.Button(root, text="Restart game",command=self.restartGame, height=1, width=18, bd='5', font=("Ariel", 10))
         self.resetButton.pack(pady=0,padx=0)
@@ -29,7 +29,7 @@ class Window:
         self.list_Of_Tiles = [[] for self.GridSize in range(self.GridSize + 1)]
         del self.list_Of_Tiles[-1]
         self.flagNumber = 0
-        self.amount_of_bombs = 40
+        self.amount_of_bombs = 5
         self.amount_of_tiles_with_numbers_revealed = 0
         self.currntNumberOfBombs = self.amount_of_bombs
         self.label.configure(text="MineSweep")
@@ -81,7 +81,7 @@ class Window:
 
     def restartGame(self):
         self.flagNumber = 0
-        self.amount_of_bombs = 40
+        self.amount_of_bombs = 5
         self.amount_of_tiles_with_numbers_revealed = 0
         for row in self.list_Of_Tiles:
             for b in row:
@@ -95,7 +95,7 @@ class Window:
     def win_condition(self):
         if self.amount_of_tiles_with_numbers_revealed == self.amount_of_tiles_with_numbers:
             myMsg = "you win!"
-            self.label.configure(myMsg)
+            self.label.configure(text=myMsg)
             self.endGame()
     def endGame(self):
         for i in range(len(self.list_Of_Tiles)):
@@ -239,6 +239,7 @@ class Button:
         self.placedNumber = False
         self.numberOnTile = 0
         self.index = (0,0)
+        self.adjacentFlags = 0
         # 5 = mid tiles
         self.tileSide = 5
         self.button.bind('<Button-3>', self.pressedRight)
@@ -251,24 +252,137 @@ class Button:
         self.numberOnTile = 0
         self.flag = False
         self.button.bind('<Button-3>', self.pressedRight)
+        self.adjacentFlags = 0
+
     def pressedRight(self, event):
+        i = self.index[0]
+        j = self.index[1]
         if self.flag == False:
             if self.placedNumber == True:
+                if self.adjacentFlags == self.numberOnTile:
+                    self.adjacentPress(i,j)
                 pass
             else:
+                self.adjacentAddFlag(i,j,1)
                 self.button.configure(image=self.FlagImage, height=20, width=18)
                 window.flagNumber += 1
                 self.flag = True
                 window.currntNumberOfBombs -= 1
                 window.currnt_number_bombs.configure(text="number of bombs: " +  str(window.currntNumberOfBombs))
+
+
         else:
             self.button.configure(image="", height=1, width=2)
             self.flag = False
             window.currntNumberOfBombs += 1
             window.currnt_number_bombs.configure(text="number of bombs: " +  str(window.currntNumberOfBombs))
+            self.adjacentAddFlag(i,j,-1)
+    def adjacentPress(self,i,j):
+        match self.tileSide:
+            case 1:
+                self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+            case 2:
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
+            case 3:
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
+            case 4:
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
+            case 5:
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
+            case 6:
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
+            case 7:
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i + 1][j])
+            case 8:
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i][j + 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
+            case 9:
+                self.pressedButton(window.list_Of_Tiles[i][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
+                self.pressedButton(window.list_Of_Tiles[i - 1][j])
 
+    def adjacentAddFlag(self,i,j,toAdd):
+        match self.tileSide:
+            case 1:
+                window.list_Of_Tiles[i + 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+            case 2:
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j - 1].adjacentFlags += toAdd
+            case 3:
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j - 1].adjacentFlags += toAdd
+            case 4:
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j + 1].adjacentFlags += toAdd
+            case 5:
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j - 1].adjacentFlags += toAdd
+            case 6:
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j - 1].adjacentFlags += toAdd
+            case 7:
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i + 1][j].adjacentFlags += toAdd
+            case 8:
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i][j + 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j + 1].adjacentFlags += toAdd
+            case 9:
+                window.list_Of_Tiles[i][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j - 1].adjacentFlags += toAdd
+                window.list_Of_Tiles[i - 1][j].adjacentFlags += toAdd
     def pressedButton(self, currentButton = None):
-
+        if self.flag:
+            return
         msg = tk.Label(root, text="", height=2, bg="lightgray", bd=5, fg="black", font=("Courier", 44))
         msg.pack(pady=0)
         msg.place(x=90, y=13)
@@ -310,6 +424,14 @@ class Button:
             # if 0 press the adjacent tiles
 
         else:
+            if currentButton.flag:
+                return
+            if currentButton.placedMine:
+                print("hi")
+                window.label.configure(text ="You lost, game over")
+                currentButton.button.configure(image=currentButton.MineImage,height=20, width=18,bg="red")
+                window.endGame()
+                return
             if currentButton.placedNumber == True:
                 return
             if currentButton.flag == True:
@@ -344,56 +466,7 @@ class Button:
             if self.numberOnTile == 0:
                 i = self.index[0]
                 j = self.index[1]
-                match self.tileSide:
-                    case 1:
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                    case 2:
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
-                    case 3:
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
-                    case 4:
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
-                    case 5:
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
-                    case 6:
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j - 1])
-                    case 7:
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i + 1][j])
-                    case 8:
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i][j + 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j + 1])
-                    case 9:
-                        self.pressedButton(window.list_Of_Tiles[i][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j - 1])
-                        self.pressedButton(window.list_Of_Tiles[i - 1][j])
+                self.adjacentPress(i,j)
         else:
             if currentButton.numberOnTile == 0:
                 i = currentButton.index[0]
