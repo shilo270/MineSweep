@@ -13,7 +13,7 @@ class Window:
         self.label.pack(pady=0)
         self.label.place(x=200, y=10)
         #self.root.attributes('-fullscreen',True)
-        self.GridSize = 5
+        self.GridSize = 15
         self.init_game()
         self.resetButton = tk.Button(root, text="Restart game",command=self.restartGame, height=1, width=18, bd='5', font=("Ariel", 10))
         self.resetButton.pack(pady=0,padx=0)
@@ -29,7 +29,7 @@ class Window:
         self.list_Of_Tiles = [[] for self.GridSize in range(self.GridSize + 1)]
         del self.list_Of_Tiles[-1]
         self.flagNumber = 0
-        self.amount_of_bombs = 5
+        self.amount_of_bombs = 40
         self.amount_of_tiles_with_numbers_revealed = 0
         self.currntNumberOfBombs = self.amount_of_bombs
         self.label.configure(text="MineSweep")
@@ -80,16 +80,31 @@ class Window:
 
 
     def restartGame(self):
-        self.init_game()
+        self.flagNumber = 0
+        self.amount_of_bombs = 40
+        self.amount_of_tiles_with_numbers_revealed = 0
+        for row in self.list_Of_Tiles:
+            for b in row:
+                b.resetButton()
+
+        self.placeMines(self.amount_of_bombs)
+        self.currntNumberOfBombs = self.amount_of_bombs
+        self.currnt_number_bombs.configure(text="number of bombs: " + str(self.currntNumberOfBombs))
         pass
 
     def win_condition(self):
         if self.amount_of_tiles_with_numbers_revealed == self.amount_of_tiles_with_numbers:
             myMsg = "you win!"
-            # msg = tk.Label(root, text="you win!", height=2, bg="lightgray", bd=5, fg="black", font=("Courier", 44))
-            # msg.pack(pady=0)
-            # msg.place(x=200, y=10)
             self.label.configure(myMsg)
+            self.endGame()
+    def endGame(self):
+        for i in range(len(self.list_Of_Tiles)):
+            for j in range(len(self.list_Of_Tiles[0])):
+                b = self.list_Of_Tiles[i][j]
+                b.button.configure(command=self.do_nothing)
+                if b.placedMine == True:
+                    b.button.configure(image=b.MineImage, height=20, width=18)
+                b.button.unbind('<Button-3>')
 
 
     def placeMines(self,numberOfMines):
@@ -219,8 +234,8 @@ class Button:
         self.MineImage =ImageTk.PhotoImage(Image.open('MineImage.png').resize((13,13)))
         self.FlagImage =ImageTk.PhotoImage(Image.open('Flag.png').resize((13,13)))
         self.TransparentImage =ImageTk.PhotoImage(Image.open('transparent.png').resize((13,13)))
-
         self.button = tk.Button(root, command=self.pressedButton,height=1, width=2)
+        self.defaultColor = self.button.cget('bg')
         self.placedNumber = False
         self.numberOnTile = 0
         self.index = (0,0)
@@ -229,7 +244,13 @@ class Button:
         self.button.bind('<Button-3>', self.pressedRight)
         self.flag = False
     #def openAdjacentTiles(pressedButton(self)):
-
+    def resetButton(self):
+        self.button.configure(text = "",image="",command=self.pressedButton, height=1, width=2,background=self.defaultColor)
+        self.placedMine = False
+        self.placedNumber = False
+        self.numberOnTile = 0
+        self.flag = False
+        self.button.bind('<Button-3>', self.pressedRight)
     def pressedRight(self, event):
         if self.flag == False:
             if self.placedNumber == True:
@@ -256,11 +277,7 @@ class Button:
             if self.placedMine is True:
                 window.label.configure(text ="You lost, game over")
                 self.button.configure(image=self.MineImage,height=20, width=18,bg="red")
-                for i in range(len(window.list_Of_Tiles)):
-                    for j in range(len(window.list_Of_Tiles[0])):
-                        window.list_Of_Tiles[i][j].button.configure(command=window.do_nothing)
-                        if window.list_Of_Tiles[i][j].placedMine == True:
-                            window.list_Of_Tiles[i][j].button.configure(image=self.MineImage,height=20, width=18)
+                window.endGame()
 
             else:
                 if self.flag == True:
@@ -329,7 +346,6 @@ class Button:
                 j = self.index[1]
                 match self.tileSide:
                     case 1:
-                        print("hi")
                         self.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
                         self.pressedButton(window.list_Of_Tiles[i][j + 1])
                         self.pressedButton(window.list_Of_Tiles[i + 1][j])
@@ -384,7 +400,6 @@ class Button:
                 j = currentButton.index[1]
                 match currentButton.tileSide:
                     case 1:
-                        print("hi")
                         currentButton.pressedButton(window.list_Of_Tiles[i + 1][j + 1])
                         currentButton.pressedButton(window.list_Of_Tiles[i][j + 1])
                         currentButton.pressedButton(window.list_Of_Tiles[i + 1][j])
